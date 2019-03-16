@@ -7,6 +7,7 @@ from vectormath import Vector2 as Vector
 WIDTH = 800
 HEIGHT = 600
 title = "Pong"
+version = "v0.0"
 running = True
 fullscreen = False
 
@@ -53,37 +54,30 @@ class Pong(object):
             self.vel.y = -5.5
             self.vel.x = self.speed * 1.26 if self.vel.x >= 0 else -self.speed * 1.26
             # print(-3)
-
         elif self.pos.y <= paddle.y + segment * 2:  # segment -2
             self.vel.y = -4
             self.vel.x = self.speed * 1.18 if self.vel.x >= 0 else -self.speed * 1.18
             # print(-2)
-
         elif self.pos.y <= paddle.y + segment * 3:  # segment -1
             self.vel.y = -2.5
             self.vel.x = self.speed * 1.1 if self.vel.x >= 0 else -self.speed * 1.1
             # print(-2)
-
         elif self.pos.y <= paddle.y + segment * 4:  # segment 0
             self.vel.y = 0
             self.vel.x = self.speed if self.vel.x >= 0 else -self.speed
             # print(0)
-
         elif self.pos.y <= paddle.y + segment * 5:  # segment 0
             self.vel.y = 0
             self.vel.x = self.speed if self.vel.x >= 0 else -self.speed
             # print(0)
-
         elif self.pos.y <= paddle.y + segment * 6:  # segment 1
             self.vel.y = 2.5
             self.vel.x = self.speed * 1.1 if self.vel.x >= 0 else -self.speed * 1.1
             # print(1)
-
         elif self.pos.y <= paddle.y + segment * 7:  # segment 2
             self.vel.y = 4
             self.vel.x = self.speed * 1.18 if self.vel.x >= 0 else -self.speed * 1.18
             # print(2)
-
         elif self.pos.y <= paddle.y + segment * 8 + self.rad:  # segment 3
             self.vel.y = 5.5
             self.vel.x = self.speed * 1.26 if self.vel.x >= 0 else -self.speed * 1.26
@@ -264,7 +258,8 @@ def show_fps():
 
 
 def game_init():
-    global window, clock, fps_font, score_font, player1_score, player2_score, masaaki, hit_low, hit_high, score_left, score_right
+    global window, clock, fps_font, score_font, player1_score, player2_score, masaaki, \
+        hit_low, hit_high, score_left, score_right
     os.environ["SDL_VIDEO_CENTERED"] = "1"
     pygame.mixer.init(22050, -16, 2, 512)
     pygame.init()
