@@ -27,12 +27,14 @@ class Pong(object):
     def update(self):
         self.pos += self.vel
         if self.pos.y - self.rad <= 3 or self.pos.y + self.rad >= HEIGHT - 3:
+            hit_high.play()
             self.vel.y *= -1
 
     def collide(self, paddle) -> bool:
         if paddle.x < self.pos.x - self.rad < paddle.x + paddle.width or \
                 paddle.x + paddle.width > self.pos.x + self.rad > paddle.x:
             if self.pos.y + self.rad > paddle.y and self.pos.y - self.rad < paddle.y + paddle.height:
+                hit_low.play()
                 return True
         return False
 
@@ -89,8 +91,10 @@ class Pong(object):
 
     def score(self) -> str:
         if self.pos.x - self.rad // 2 <= 0:
+            score_left.play()
             return "player1"
         elif self.pos.x + self.rad // 2 >= WIDTH:
+            score_right.play()
             return "player2"
         else:
             return "who?"
@@ -260,8 +264,9 @@ def show_fps():
 
 
 def game_init():
-    global window, clock, fps_font, score_font, player1_score, player2_score, masaaki
+    global window, clock, fps_font, score_font, player1_score, player2_score, masaaki, hit_low, hit_high, score_left, score_right
     os.environ["SDL_VIDEO_CENTERED"] = "1"
+    pygame.mixer.init(22050, -16, 2, 512)
     pygame.init()
     window = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption(title)
@@ -271,6 +276,10 @@ def game_init():
     masaaki = os.path.join("gfx", "Masaaki-Regular.otf")
     fps_font = pygame.font.Font(masaaki, 20)
     score_font = pygame.font.Font(masaaki, 50)
+    hit_low = pygame.mixer.Sound(os.path.join("sounds", "hit_low.wav"))
+    hit_high = pygame.mixer.Sound(os.path.join("sounds", "hit_high.wav"))
+    score_left = pygame.mixer.Sound(os.path.join("sounds", "score_left.wav"))
+    score_right = pygame.mixer.Sound(os.path.join("sounds", "score_right.wav"))
     player1_score = 0
     player2_score = 0
 
