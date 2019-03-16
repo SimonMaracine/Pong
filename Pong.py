@@ -49,12 +49,12 @@ class Pong(object):
         segment = paddle.height / 8
         if self.pos.y - self.rad <= paddle.y + segment:  # segment -3
             self.vel.y = -5.5
-            self.vel.x = self.speed * 1.3 if self.vel.x >= 0 else -self.speed * 1.3
+            self.vel.x = self.speed * 1.26 if self.vel.x >= 0 else -self.speed * 1.26
             # print(-3)
 
         elif self.pos.y <= paddle.y + segment * 2:  # segment -2
             self.vel.y = -4
-            self.vel.x = self.speed * 1.2 if self.vel.x >= 0 else -self.speed * 1.2
+            self.vel.x = self.speed * 1.18 if self.vel.x >= 0 else -self.speed * 1.18
             # print(-2)
 
         elif self.pos.y <= paddle.y + segment * 3:  # segment -1
@@ -79,12 +79,12 @@ class Pong(object):
 
         elif self.pos.y <= paddle.y + segment * 7:  # segment 2
             self.vel.y = 4
-            self.vel.x = self.speed * 1.2 if self.vel.x >= 0 else -self.speed * 1.2
+            self.vel.x = self.speed * 1.18 if self.vel.x >= 0 else -self.speed * 1.18
             # print(2)
 
         elif self.pos.y <= paddle.y + segment * 8 + self.rad:  # segment 3
             self.vel.y = 5.5
-            self.vel.x = self.speed * 1.3 if self.vel.x >= 0 else -self.speed * 1.3
+            self.vel.x = self.speed * 1.26 if self.vel.x >= 0 else -self.speed * 1.26
             # print(3)
 
     def score(self) -> str:
@@ -96,7 +96,7 @@ class Pong(object):
             return "who?"
 
     def go_harder(self):
-        self.speed += 0.5
+        self.speed += 0.6
         self.color[1] -= 40
         self.color[2] -= 40
 
@@ -106,7 +106,7 @@ class Paddle(object):
         self.name = name
         self.x = x
         self.width = 16
-        self.height = 75
+        self.height = 80
         self.y = HEIGHT // 2 - self.height // 2
         self.speed = 9
         self.color = color
@@ -143,7 +143,7 @@ def toggle_fullscreen():
 def pause_game() -> int:
     global running
     q = 0
-    pause_font = pygame.font.SysFont("calibri", 50, True)
+    pause_font = pygame.font.Font(masaaki, 50)
     pause_text = pause_font.render("PAUSED", True, (240, 240, 240))
     pause_width = pause_text.get_width()
     pause = True
@@ -175,8 +175,8 @@ def pause_game() -> int:
 def splash_screen() -> int:
     global running
     q = 0
-    title_font = pygame.font.SysFont("calibri", 80, True)
-    start_font = pygame.font.SysFont("calibri", 45, True)
+    title_font = pygame.font.Font(masaaki, 100)
+    start_font = pygame.font.Font(masaaki, 45)
     start_text = start_font.render("Press SPACE to start.", True, (240, 240, 240))
     start_width = start_text.get_width()
     title_text = title_font.render("PONG", True, (240, 240, 240))
@@ -210,14 +210,14 @@ def splash_screen() -> int:
 
 def game_over(player):
     global running
-    start_font = pygame.font.SysFont("calibri", 45, True)
-    game_over_font = pygame.font.SysFont("calibri", 50, True)
+    start_font = pygame.font.Font(masaaki, 45)
+    game_over_font = pygame.font.Font(masaaki, 50)
     restart_text = start_font.render("Press SPACE to end match.", True, (240, 240, 240))
     restart_text_width = restart_text.get_width()
     background = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
     run = True
 
-    background.fill((0, 0, 0, 95))
+    background.fill((0, 0, 0, 96))
     if player == "player1":
         game_over_text = game_over_font.render("Player 1 wins.", True, (255, 240, 240))
         background.blit(game_over_text, (60, HEIGHT // 2 - 40))
@@ -225,7 +225,7 @@ def game_over(player):
         game_over_text = game_over_font.render("Player 2 wins.", True, (240, 240, 255))
         text_width = game_over_text.get_width()
         background.blit(game_over_text, (WIDTH - text_width - 60, HEIGHT // 2 - 40))
-    background.blit(restart_text, (WIDTH // 2 - restart_text_width // 2, HEIGHT // 2 + 60))
+    background.blit(restart_text, (WIDTH // 2 - restart_text_width // 2, HEIGHT // 2 + 160))
     window.blit(background, (0, 0))
     pygame.display.flip()
 
@@ -256,11 +256,11 @@ def show_scores():
 
 def show_fps():
     fps_text = fps_font.render("FPS: " + str(int(clock.get_fps())), True, (255, 255, 255))
-    window.blit(fps_text, (6, HEIGHT - 18))
+    window.blit(fps_text, (6, HEIGHT - 30))
 
 
 def game_init():
-    global window, clock, fps_font, score_font, player1_score, player2_score
+    global window, clock, fps_font, score_font, player1_score, player2_score, masaaki
     os.environ["SDL_VIDEO_CENTERED"] = "1"
     pygame.init()
     window = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -268,9 +268,9 @@ def game_init():
     pygame.display.set_icon(pygame.image.load(os.path.join("gfx", "pong.png")))
     pygame.mouse.set_visible(False)
     clock = pygame.time.Clock()
-    fps_font = pygame.font.SysFont("calibri", 16, True)
-    score_font = pygame.font.SysFont("calibri", 40, True)
-
+    masaaki = os.path.join("gfx", "Masaaki-Regular.otf")
+    fps_font = pygame.font.Font(masaaki, 20)
+    score_font = pygame.font.Font(masaaki, 50)
     player1_score = 0
     player2_score = 0
 
@@ -316,9 +316,9 @@ def game_loop():
         paddle1.render()
         paddle2.render()
         for i in range(30):
-            pygame.draw.rect(window, (200, 200, 200), (WIDTH // 2, i * 19.8 + 6, 2, 13.5))
-        pygame.draw.line(window, (200, 200, 200), (0, 1), (WIDTH, 1), 2)
-        pygame.draw.line(window, (200, 200, 200), (0, HEIGHT - 3), (WIDTH, HEIGHT - 3), 2)
+            pygame.draw.rect(window, (230, 230, 230), (WIDTH // 2, i * 19.8 + 6, 2, 13.5))
+        pygame.draw.line(window, (230, 230, 230), (0, 2), (WIDTH, 2), 3)
+        pygame.draw.line(window, (230, 230, 230), (0, HEIGHT - 5), (WIDTH, HEIGHT - 5), 3)
         show_scores()
         show_fps()
 
