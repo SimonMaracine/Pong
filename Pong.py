@@ -15,7 +15,7 @@ fullscreen = False
 class Pong(object):
     def __init__(self, x):
         self.x = x
-        self.speed = 8
+        self.speed = 10
         self.pos = Vector(WIDTH // 2, HEIGHT // 2)
         self.init_vel = Vector(self.speed * self.x, randint(-2, 2))
         self.vel = self.init_vel
@@ -51,15 +51,15 @@ class Pong(object):
         # Bounce on the y axis.
         segment = paddle.height / 8
         if self.pos.y - self.rad <= paddle.y + segment:  # segment -3
-            self.vel.y = -5.5
+            self.vel.y = -6
             self.vel.x = self.speed * 1.26 if self.vel.x >= 0 else -self.speed * 1.26
             # print(-3)
         elif self.pos.y <= paddle.y + segment * 2:  # segment -2
-            self.vel.y = -4
+            self.vel.y = -5
             self.vel.x = self.speed * 1.18 if self.vel.x >= 0 else -self.speed * 1.18
             # print(-2)
         elif self.pos.y <= paddle.y + segment * 3:  # segment -1
-            self.vel.y = -2.5
+            self.vel.y = -3
             self.vel.x = self.speed * 1.1 if self.vel.x >= 0 else -self.speed * 1.1
             # print(-2)
         elif self.pos.y <= paddle.y + segment * 4:  # segment 0
@@ -71,15 +71,15 @@ class Pong(object):
             self.vel.x = self.speed if self.vel.x >= 0 else -self.speed
             # print(0)
         elif self.pos.y <= paddle.y + segment * 6:  # segment 1
-            self.vel.y = 2.5
+            self.vel.y = 3
             self.vel.x = self.speed * 1.1 if self.vel.x >= 0 else -self.speed * 1.1
             # print(1)
         elif self.pos.y <= paddle.y + segment * 7:  # segment 2
-            self.vel.y = 4
+            self.vel.y = 5
             self.vel.x = self.speed * 1.18 if self.vel.x >= 0 else -self.speed * 1.18
             # print(2)
         elif self.pos.y <= paddle.y + segment * 8 + self.rad:  # segment 3
-            self.vel.y = 5.5
+            self.vel.y = 6
             self.vel.x = self.speed * 1.26 if self.vel.x >= 0 else -self.speed * 1.26
             # print(3)
 
@@ -94,9 +94,10 @@ class Pong(object):
             return "who?"
 
     def go_harder(self):
-        self.speed += 0.6
-        self.color[1] -= 40
-        self.color[2] -= 40
+        if self.color[1] > 40:
+            self.speed += 0.6
+            self.color[1] -= 40
+            self.color[2] -= 40
 
 
 class Paddle(object):
@@ -106,7 +107,7 @@ class Paddle(object):
         self.width = 16
         self.height = 80
         self.y = HEIGHT // 2 - self.height // 2
-        self.speed = 9
+        self.speed = 10
         self.color = color
 
     def render(self):
