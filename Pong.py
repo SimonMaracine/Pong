@@ -15,7 +15,7 @@ fullscreen = False
 class Pong(object):
     def __init__(self, x):
         self.x = x
-        self.speed = 10
+        self.speed = 11
         self.pos = Vector(WIDTH // 2, HEIGHT // 2)
         self.init_vel = Vector(self.speed * self.x, randint(-2, 2))
         self.vel = self.init_vel
@@ -52,15 +52,15 @@ class Pong(object):
         segment = paddle.height / 8
         if self.pos.y - self.rad <= paddle.y + segment:  # segment -3
             self.vel.y = -6
-            self.vel.x = self.speed * 1.26 if self.vel.x >= 0 else -self.speed * 1.26
+            self.vel.x = self.speed * 1.23 if self.vel.x >= 0 else -self.speed * 1.23
             # print(-3)
         elif self.pos.y <= paddle.y + segment * 2:  # segment -2
             self.vel.y = -5
-            self.vel.x = self.speed * 1.18 if self.vel.x >= 0 else -self.speed * 1.18
+            self.vel.x = self.speed * 1.15 if self.vel.x >= 0 else -self.speed * 1.15
             # print(-2)
         elif self.pos.y <= paddle.y + segment * 3:  # segment -1
             self.vel.y = -3
-            self.vel.x = self.speed * 1.1 if self.vel.x >= 0 else -self.speed * 1.1
+            self.vel.x = self.speed * 1.09 if self.vel.x >= 0 else -self.speed * 1.09
             # print(-2)
         elif self.pos.y <= paddle.y + segment * 4:  # segment 0
             self.vel.y = 0
@@ -72,15 +72,15 @@ class Pong(object):
             # print(0)
         elif self.pos.y <= paddle.y + segment * 6:  # segment 1
             self.vel.y = 3
-            self.vel.x = self.speed * 1.1 if self.vel.x >= 0 else -self.speed * 1.1
+            self.vel.x = self.speed * 1.09 if self.vel.x >= 0 else -self.speed * 1.09
             # print(1)
         elif self.pos.y <= paddle.y + segment * 7:  # segment 2
             self.vel.y = 5
-            self.vel.x = self.speed * 1.18 if self.vel.x >= 0 else -self.speed * 1.18
+            self.vel.x = self.speed * 1.15 if self.vel.x >= 0 else -self.speed * 1.15
             # print(2)
         elif self.pos.y <= paddle.y + segment * 8 + self.rad:  # segment 3
             self.vel.y = 6
-            self.vel.x = self.speed * 1.26 if self.vel.x >= 0 else -self.speed * 1.26
+            self.vel.x = self.speed * 1.23 if self.vel.x >= 0 else -self.speed * 1.23
             # print(3)
 
     def score(self) -> str:
@@ -94,10 +94,10 @@ class Pong(object):
             return "who?"
 
     def go_harder(self):
-        if self.color[1] > 40:
-            self.speed += 0.6
-            self.color[1] -= 40
-            self.color[2] -= 40
+        if self.color[1] > 50:
+            self.speed += 0.8
+            self.color[1] -= 50
+            self.color[2] -= 50
 
 
 class Paddle(object):
@@ -105,7 +105,7 @@ class Paddle(object):
         self.name = name
         self.x = x
         self.width = 16
-        self.height = 80
+        self.height = 85
         self.y = HEIGHT // 2 - self.height // 2
         self.speed = 10
         self.color = color
@@ -126,17 +126,24 @@ class Paddle(object):
             self.y += self.speed
 
 
-def toggle_fullscreen():
+def toggle_fullscreen(mode):
     global window, fullscreen
-    last_frame = window.copy()
-    if not fullscreen:
-        window = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
-        fullscreen = True
+    if mode == "init":
+        if not fullscreen:
+            window = pygame.display.set_mode((WIDTH, HEIGHT))
+        else:
+            window = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
     else:
-        window = pygame.display.set_mode((WIDTH, HEIGHT))
-        fullscreen = False
-    window.blit(last_frame, (0, 0))
-    pause_game_state()
+        last_frame = window.copy()
+        if not fullscreen:
+            window = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
+            fullscreen = True
+        else:
+            window = pygame.display.set_mode((WIDTH, HEIGHT))
+            fullscreen = False
+        window.blit(last_frame, (0, 0))
+        if mode == "game":
+            pause_game_state()
 
 
 def info_state() -> int:
@@ -148,20 +155,12 @@ def info_state() -> int:
     masaaki_text = info_font.render("Font, Masaaki-Regular, by Philippe Moesch.", True, (240, 240, 240))
     instructions_text1 = instructions_font.render("Move paddles using W-S and Up-Down.", True, (240, 240, 240))
     instructions_text2 = instructions_font.render("First player to score 10 points wins.", True, (240, 240, 240))
-    instructions_text3 = instructions_font.render("Press P to pause the game, F to switch fullscreen,", True, (240, 240, 240))
-    instructions_text4 = instructions_font.render("ESC to quit and, while in start menu, H to display help.", True, (240, 240, 240))
+    instructions_text3 = instructions_font.render("Press P to pause the game, F to switch fullscreen,",
+                                                  True, (240, 240, 240))
+    instructions_text4 = instructions_font.render("ESC to quit and, while in start menu, H to display help.",
+                                                  True, (240, 240, 240))
     go_back_text = info_font.render("Press SPACE to go back.", True, (240, 240, 240))
     info = True
-
-    window.fill((2, 2, 2))
-    window.blit(about_text, (WIDTH // 2 - about_text.get_width() // 2, HEIGHT // 2 - 240))
-    window.blit(masaaki_text, (WIDTH // 2 - masaaki_text.get_width() // 2, HEIGHT // 2 - 180))
-    window.blit(instructions_text1, (WIDTH // 2 - instructions_text1.get_width() // 2, HEIGHT // 2 - 50))
-    window.blit(instructions_text2, (WIDTH // 2 - instructions_text2.get_width() // 2, HEIGHT // 2))
-    window.blit(instructions_text3, (WIDTH // 2 - instructions_text3.get_width() // 2, HEIGHT // 2 + 50))
-    window.blit(instructions_text4, (WIDTH // 2 - instructions_text4.get_width() // 2, HEIGHT // 2 + 100))
-    window.blit(go_back_text, (WIDTH // 2 - go_back_text.get_width() // 2, HEIGHT // 2 + 210))
-    pygame.display.flip()
 
     while info:
         for event in pygame.event.get():
@@ -175,10 +174,20 @@ def info_state() -> int:
                     running = False
                     q = 1
                 elif event.key == pygame.K_f:
-                    toggle_fullscreen()
+                    toggle_fullscreen("menu")
                 elif event.key == pygame.K_SPACE:
                     info = False
 
+        window.fill((2, 2, 2))
+        window.blit(about_text, (WIDTH // 2 - about_text.get_width() // 2, HEIGHT // 2 - 240))
+        window.blit(masaaki_text, (WIDTH // 2 - masaaki_text.get_width() // 2, HEIGHT // 2 - 180))
+        window.blit(instructions_text1, (WIDTH // 2 - instructions_text1.get_width() // 2, HEIGHT // 2 - 50))
+        window.blit(instructions_text2, (WIDTH // 2 - instructions_text2.get_width() // 2, HEIGHT // 2))
+        window.blit(instructions_text3, (WIDTH // 2 - instructions_text3.get_width() // 2, HEIGHT // 2 + 50))
+        window.blit(instructions_text4, (WIDTH // 2 - instructions_text4.get_width() // 2, HEIGHT // 2 + 100))
+        window.blit(go_back_text, (WIDTH // 2 - go_back_text.get_width() // 2, HEIGHT // 2 + 210))
+        show_version()
+        pygame.display.flip()
         clock.tick(60)
     return q
 
@@ -186,13 +195,10 @@ def info_state() -> int:
 def pause_game_state() -> int:
     global running
     q = 0
-    pause_font = pygame.font.Font(masaaki, 50)
+    pause_font = pygame.font.Font(masaaki, 55)
     pause_text = pause_font.render("PAUSED", True, (240, 240, 240))
     pause_width = pause_text.get_width()
     pause = True
-
-    window.blit(pause_text, (WIDTH // 2 - pause_width // 2, HEIGHT // 2 - 50))
-    pygame.display.flip()
 
     while pause:
         for event in pygame.event.get():
@@ -206,11 +212,13 @@ def pause_game_state() -> int:
                     running = False
                     q = 1
                 elif event.key == pygame.K_f:
-                    toggle_fullscreen()
+                    toggle_fullscreen("menu")
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p or event.key == pygame.K_SPACE:
                     pause = False
 
+        window.blit(pause_text, (WIDTH // 2 - pause_width // 2, HEIGHT // 2 - 50))
+        pygame.display.flip()
         clock.tick(60)
     return q
 
@@ -240,7 +248,7 @@ def splash_screen_state() -> int:
                 elif event.key == pygame.K_SPACE:
                     start = True
                 elif event.key == pygame.K_f:
-                    toggle_fullscreen()
+                    toggle_fullscreen("menu")
                 elif event.key == pygame.K_h:
                     if info_state() == 1:
                         start = True
@@ -249,6 +257,7 @@ def splash_screen_state() -> int:
         window.fill((2, 2, 2))
         window.blit(title_text, (WIDTH // 2 - title_width // 2, 100))
         window.blit(start_text, (WIDTH // 2 - start_width // 2, HEIGHT // 2 + 140))
+        show_version()
         pygame.display.flip()
         clock.tick(60)
     return q
@@ -287,7 +296,9 @@ def game_over_state(player):
                 elif event.key == pygame.K_SPACE:
                     run = False
                 elif event.key == pygame.K_f:
-                    toggle_fullscreen()
+                    toggle_fullscreen("menu")
+                    window.blit(background, (0, 0))
+                    pygame.display.flip()
 
         clock.tick(60)
 
@@ -305,13 +316,18 @@ def show_fps():
     window.blit(fps_text, (6, HEIGHT - 30))
 
 
+def show_version():
+    version_text = fps_font.render(version, True, (255, 255, 255))
+    window.blit(version_text, (WIDTH - 40, HEIGHT - 30))
+
+
 def game_init():
     global window, clock, fps_font, score_font, player1_score, player2_score, masaaki, \
         hit_low, hit_high, score_left, score_right
     os.environ["SDL_VIDEO_CENTERED"] = "1"
     pygame.mixer.init(22050, -16, 2, 512)
     pygame.init()
-    window = pygame.display.set_mode((WIDTH, HEIGHT))
+    toggle_fullscreen("init")
     pygame.display.set_caption(title)
     pygame.display.set_icon(pygame.image.load(os.path.join("gfx", "pong.png")))
     pygame.mouse.set_visible(False)
@@ -364,13 +380,13 @@ def game_loop():
             pygame.time.wait(400)
 
     def render():
-        pong.render()
-        paddle1.render()
-        paddle2.render()
         for i in range(30):
             pygame.draw.rect(window, (230, 230, 230), (WIDTH // 2, i * 19.8 + 6, 2, 13.5))
         pygame.draw.line(window, (230, 230, 230), (0, 2), (WIDTH, 2), 3)
         pygame.draw.line(window, (230, 230, 230), (0, HEIGHT - 5), (WIDTH, HEIGHT - 5), 3)
+        pong.render()
+        paddle1.render()
+        paddle2.render()
         show_scores()
         show_fps()
 
@@ -387,7 +403,7 @@ def game_loop():
                     run = False
                     running = False
                 elif event.key == pygame.K_f:
-                    toggle_fullscreen()
+                    toggle_fullscreen("game")
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     if pause_game_state() == 1:
@@ -409,7 +425,6 @@ def game_loop():
         update()
         render()
         pygame.display.flip()
-        clock.tick(60)
         if not did_once:
             pygame.time.wait(300)
             did_once = True
@@ -419,6 +434,7 @@ def game_loop():
         elif player2_score == 10:
             run = False
             game_over_state("player2")
+        clock.tick(60)
 
 
 if __name__ == "__main__":
