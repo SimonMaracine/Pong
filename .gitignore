@@ -1,2 +1,9 @@
 # Ignoring xml files.
 *.xml
+*.spec
+*.exe
+*.toc
+*.zip
+*.pkg
+*.manifest
+*.pyz
