@@ -136,10 +136,54 @@ def toggle_fullscreen():
         window = pygame.display.set_mode((WIDTH, HEIGHT))
         fullscreen = False
     window.blit(last_frame, (0, 0))
-    pause_game()
+    pause_game_state()
 
 
-def pause_game() -> int:
+def info_state() -> int:
+    global running
+    q = 0
+    info_font = pygame.font.Font(masaaki, 40)
+    instructions_font = pygame.font.Font(masaaki, 28)
+    about_text = info_font.render("Pong clone coded by Simon.", True, (240, 240, 240))
+    masaaki_text = info_font.render("Font, Masaaki-Regular, by Philippe Moesch.", True, (240, 240, 240))
+    instructions_text1 = instructions_font.render("Move paddles using W-S and Up-Down.", True, (240, 240, 240))
+    instructions_text2 = instructions_font.render("First player to score 10 points wins.", True, (240, 240, 240))
+    instructions_text3 = instructions_font.render("Press P to pause the game, F to switch fullscreen,", True, (240, 240, 240))
+    instructions_text4 = instructions_font.render("ESC to quit and, while in start menu, H to display help.", True, (240, 240, 240))
+    go_back_text = info_font.render("Press SPACE to go back.", True, (240, 240, 240))
+    info = True
+
+    window.fill((2, 2, 2))
+    window.blit(about_text, (WIDTH // 2 - about_text.get_width() // 2, HEIGHT // 2 - 240))
+    window.blit(masaaki_text, (WIDTH // 2 - masaaki_text.get_width() // 2, HEIGHT // 2 - 180))
+    window.blit(instructions_text1, (WIDTH // 2 - instructions_text1.get_width() // 2, HEIGHT // 2 - 50))
+    window.blit(instructions_text2, (WIDTH // 2 - instructions_text2.get_width() // 2, HEIGHT // 2))
+    window.blit(instructions_text3, (WIDTH // 2 - instructions_text3.get_width() // 2, HEIGHT // 2 + 50))
+    window.blit(instructions_text4, (WIDTH // 2 - instructions_text4.get_width() // 2, HEIGHT // 2 + 100))
+    window.blit(go_back_text, (WIDTH // 2 - go_back_text.get_width() // 2, HEIGHT // 2 + 210))
+    pygame.display.flip()
+
+    while info:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                info = False
+                running = False
+                q = 1
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_ESCAPE:
+                    info = False
+                    running = False
+                    q = 1
+                elif event.key == pygame.K_f:
+                    toggle_fullscreen()
+                elif event.key == pygame.K_SPACE:
+                    info = False
+
+        clock.tick(60)
+    return q
+
+
+def pause_game_state() -> int:
     global running
     q = 0
     pause_font = pygame.font.Font(masaaki, 50)
@@ -171,21 +215,16 @@ def pause_game() -> int:
     return q
 
 
-def splash_screen() -> int:
+def splash_screen_state() -> int:
     global running
     q = 0
-    title_font = pygame.font.Font(masaaki, 100)
+    title_font = pygame.font.Font(masaaki, 110)
     start_font = pygame.font.Font(masaaki, 45)
     start_text = start_font.render("Press SPACE to start.", True, (240, 240, 240))
     start_width = start_text.get_width()
     title_text = title_font.render("PONG", True, (240, 240, 240))
     title_width = title_text.get_width()
     start = False
-
-    window.fill((2, 2, 2))
-    window.blit(title_text, (WIDTH // 2 - title_width // 2, 100))
-    window.blit(start_text, (WIDTH // 2 - start_width // 2, HEIGHT // 2 + 140))
-    pygame.display.flip()
 
     while not start:
         for event in pygame.event.get():
@@ -202,12 +241,20 @@ def splash_screen() -> int:
                     start = True
                 elif event.key == pygame.K_f:
                     toggle_fullscreen()
+                elif event.key == pygame.K_h:
+                    if info_state() == 1:
+                        start = True
+                        q = 1
 
+        window.fill((2, 2, 2))
+        window.blit(title_text, (WIDTH // 2 - title_width // 2, 100))
+        window.blit(start_text, (WIDTH // 2 - start_width // 2, HEIGHT // 2 + 140))
+        pygame.display.flip()
         clock.tick(60)
     return q
 
 
-def game_over(player):
+def game_over_state(player):
     global running
     start_font = pygame.font.Font(masaaki, 45)
     game_over_font = pygame.font.Font(masaaki, 50)
@@ -327,7 +374,7 @@ def game_loop():
         show_scores()
         show_fps()
 
-    if splash_screen() == 1:
+    if splash_screen_state() == 1:
         run = False
     start()
     while run:
@@ -343,7 +390,7 @@ def game_loop():
                     toggle_fullscreen()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
-                    if pause_game() == 1:
+                    if pause_game_state() == 1:
                         run = False
             elif event.type == GO_FASTER:
                 pong.go_harder()
@@ -368,10 +415,10 @@ def game_loop():
             did_once = True
         if player1_score == 10:
             run = False
-            game_over("player1")
+            game_over_state("player1")
         elif player2_score == 10:
             run = False
-            game_over("player2")
+            game_over_state("player2")
 
 
 if __name__ == "__main__":
