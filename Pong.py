@@ -7,7 +7,7 @@ from vectormath import Vector2 as Vector
 WIDTH = 800
 HEIGHT = 600
 title = "Pong"
-version = "v0.0"
+version = "v0.1"
 running = True
 fullscreen = False
 
@@ -52,15 +52,15 @@ class Pong(object):
         segment = paddle.height / 8
         if self.pos.y - self.rad <= paddle.y + segment:  # segment -3
             self.vel.y = -6
-            self.vel.x = self.speed * 1.23 if self.vel.x >= 0 else -self.speed * 1.23
+            self.vel.x = self.speed * 1.21 if self.vel.x >= 0 else -self.speed * 1.21
             # print(-3)
         elif self.pos.y <= paddle.y + segment * 2:  # segment -2
             self.vel.y = -5
-            self.vel.x = self.speed * 1.15 if self.vel.x >= 0 else -self.speed * 1.15
+            self.vel.x = self.speed * 1.14 if self.vel.x >= 0 else -self.speed * 1.14
             # print(-2)
         elif self.pos.y <= paddle.y + segment * 3:  # segment -1
             self.vel.y = -3
-            self.vel.x = self.speed * 1.09 if self.vel.x >= 0 else -self.speed * 1.09
+            self.vel.x = self.speed * 1.08 if self.vel.x >= 0 else -self.speed * 1.08
             # print(-2)
         elif self.pos.y <= paddle.y + segment * 4:  # segment 0
             self.vel.y = 0
@@ -72,15 +72,15 @@ class Pong(object):
             # print(0)
         elif self.pos.y <= paddle.y + segment * 6:  # segment 1
             self.vel.y = 3
-            self.vel.x = self.speed * 1.09 if self.vel.x >= 0 else -self.speed * 1.09
+            self.vel.x = self.speed * 1.08 if self.vel.x >= 0 else -self.speed * 1.08
             # print(1)
         elif self.pos.y <= paddle.y + segment * 7:  # segment 2
             self.vel.y = 5
-            self.vel.x = self.speed * 1.15 if self.vel.x >= 0 else -self.speed * 1.15
+            self.vel.x = self.speed * 1.14 if self.vel.x >= 0 else -self.speed * 1.14
             # print(2)
         elif self.pos.y <= paddle.y + segment * 8 + self.rad:  # segment 3
             self.vel.y = 6
-            self.vel.x = self.speed * 1.23 if self.vel.x >= 0 else -self.speed * 1.23
+            self.vel.x = self.speed * 1.21 if self.vel.x >= 0 else -self.speed * 1.21
             # print(3)
 
     def score(self) -> str:
@@ -142,8 +142,6 @@ def toggle_fullscreen(mode):
             window = pygame.display.set_mode((WIDTH, HEIGHT))
             fullscreen = False
         window.blit(last_frame, (0, 0))
-        if mode == "game":
-            pause_game_state()
 
 
 def info_state() -> int:
@@ -404,6 +402,8 @@ def game_loop():
                     running = False
                 elif event.key == pygame.K_f:
                     toggle_fullscreen("game")
+                    if pause_game_state() == 1:
+                        run = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     if pause_game_state() == 1:
