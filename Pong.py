@@ -1,5 +1,7 @@
 import os
 from random import randint, choice
+from math import tan
+from math import radians
 
 import pygame
 from vectormath import Vector2 as Vector
@@ -49,39 +51,22 @@ class Pong(object):
         self.vel.x *= -1
 
         # Bounce on the y axis.
-        segment = paddle.height / 8
-        if self.pos.y - self.rad <= paddle.y + segment:  # segment -3
-            self.vel.y = -6
-            self.vel.x = self.speed * 1.21 if self.vel.x >= 0 else -self.speed * 1.21
-            # print(-3)
-        elif self.pos.y <= paddle.y + segment * 2:  # segment -2
-            self.vel.y = -5
-            self.vel.x = self.speed * 1.14 if self.vel.x >= 0 else -self.speed * 1.14
-            # print(-2)
-        elif self.pos.y <= paddle.y + segment * 3:  # segment -1
-            self.vel.y = -3
-            self.vel.x = self.speed * 1.08 if self.vel.x >= 0 else -self.speed * 1.08
-            # print(-2)
-        elif self.pos.y <= paddle.y + segment * 4:  # segment 0
+        if paddle.get_segment(self) == 0:
+            self.vel.y = (1 / -tan(radians(15))) * abs(self.vel.x)
+        elif paddle.get_segment(self) == 1:
+            self.vel.y = (1 / -tan(radians(45))) * abs(self.vel.x)
+        elif paddle.get_segment(self) == 2:
+            self.vel.y = (1 / -tan(radians(75))) * abs(self.vel.x)
+        elif paddle.get_segment(self) == 3:
             self.vel.y = 0
-            self.vel.x = self.speed if self.vel.x >= 0 else -self.speed
-            # print(0)
-        elif self.pos.y <= paddle.y + segment * 5:  # segment 0
+        elif paddle.get_segment(self) == 4:
             self.vel.y = 0
-            self.vel.x = self.speed if self.vel.x >= 0 else -self.speed
-            # print(0)
-        elif self.pos.y <= paddle.y + segment * 6:  # segment 1
-            self.vel.y = 3
-            self.vel.x = self.speed * 1.08 if self.vel.x >= 0 else -self.speed * 1.08
-            # print(1)
-        elif self.pos.y <= paddle.y + segment * 7:  # segment 2
-            self.vel.y = 5
-            self.vel.x = self.speed * 1.14 if self.vel.x >= 0 else -self.speed * 1.14
-            # print(2)
-        elif self.pos.y <= paddle.y + segment * 8 + self.rad:  # segment 3
-            self.vel.y = 6
-            self.vel.x = self.speed * 1.21 if self.vel.x >= 0 else -self.speed * 1.21
-            # print(3)
+        elif paddle.get_segment(self) == 5:
+            self.vel.y = (1 / -tan(radians(105))) * abs(self.vel.x)
+        elif paddle.get_segment(self) == 6:
+            self.vel.y = (1 / -tan(radians(145))) * abs(self.vel.x)
+        elif paddle.get_segment(self) == 7:
+            self.vel.y = (1 / -tan(radians(165))) * abs(self.vel.x)
 
     def score(self) -> str:
         if self.pos.x - self.rad // 2 <= 0:
@@ -109,6 +94,7 @@ class Paddle(object):
         self.y = HEIGHT // 2 - self.height // 2
         self.speed = 10
         self.color = color
+        self.segment = self.height / 8
 
     def render(self):
         pygame.draw.rect(window, self.color, (self.x, self.y, self.width, self.height))
@@ -124,6 +110,25 @@ class Paddle(object):
             self.y -= self.speed
         elif dir == "down":
             self.y += self.speed
+
+    def get_segment(self, pong: Pong) -> int:
+        y = pong.pos.y + pong.rad
+        if y >= self.y + self.segment * 7:
+            return 7
+        elif y >= self.y + self.segment * 6:
+            return 6
+        elif y >= self.y + self.segment * 5:
+            return 5
+        elif y >= self.y + self.segment * 4:
+            return 4
+        elif y >= self.y + self.segment * 3:
+            return 3
+        elif y >= self.y + self.segment * 2:
+            return 2
+        elif y >= self.y + self.segment:
+            return 1
+        elif y >= self.y:
+            return 0
 
 
 def toggle_fullscreen(mode):
@@ -434,7 +439,7 @@ def game_loop():
         elif player2_score == 10:
             run = False
             game_over_state("player2")
-        clock.tick(60)
+        clock.tick(24)
 
 
 if __name__ == "__main__":
