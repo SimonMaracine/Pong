@@ -1,7 +1,7 @@
 import os
 from random import randint, choice
 from math import tan
-from math import radians
+from math import radians  # todo one import
 
 import pygame
 from vectormath import Vector2 as Vector
