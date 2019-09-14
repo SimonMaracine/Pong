@@ -1,15 +1,14 @@
 import os
-from random import randint, choice
-from math import tan
-from math import radians  # todo one import
+from random import randint, choice, uniform
+from math import tan, radians, atan, degrees, cos, sin
 
 import pygame
-from vectormath import Vector2 as Vector
+from vectormaths import Vector2 as Vector
 
 WIDTH = 800
 HEIGHT = 600
-title = "Pong"
-version = "v0.1"
+title = "Pyong"
+version = "v0.2"
 running = True
 fullscreen = False
 
@@ -19,19 +18,29 @@ class Pong(object):
         self.x = x
         self.speed = 11
         self.pos = Vector(WIDTH // 2, HEIGHT // 2)
-        self.init_vel = Vector(self.speed * self.x, randint(-2, 2))
-        self.vel = self.init_vel
+        self.vel = Vector(self.speed * self.x, randint(-2, 2))
         self.rad = 12
         self.color = [255, 255, 255]
+        self.side = self.x
+        self.boost: float = 1
 
     def render(self):
         pygame.draw.circle(window, self.color, (int(self.pos.x), int(self.pos.y)), self.rad)
 
     def update(self):
-        self.pos += self.vel
+        self.pos += self.vel * self.boost
         if self.pos.y - self.rad <= 3 or self.pos.y + self.rad >= HEIGHT - 3:
             hit_high.play()
             self.vel.y *= -1
+
+        if self.side > 0 and self.pos.x > WIDTH // 2:
+            self.side = -1
+            self.deviate()
+            self.turn_around()
+        elif self.side < 0 and self.pos.x < WIDTH // 2:
+            self.side = 1
+            self.deviate()
+            self.turn_around()
 
     def collide(self, paddle) -> bool:
         if paddle.x < self.pos.x - self.rad < paddle.x + paddle.width or \
@@ -47,26 +56,35 @@ class Pong(object):
         elif paddle.name == "right":
             self.pos.x -= 10
 
+        current_speed: float = self.vel.length()
+
         # Bounce on the x axis.
+        if self.vel.x > 0:
+            self.vel.x /= self.vel.x
+        else:
+            self.vel.x /= -self.vel.x
         self.vel.x *= -1
 
         # Bounce on the y axis.
         if paddle.get_segment(self) == 0:
-            self.vel.y = (1 / -tan(radians(15))) * abs(self.vel.x)
+            self.vel.y = (1 / -tan(radians(30)))
         elif paddle.get_segment(self) == 1:
-            self.vel.y = (1 / -tan(radians(45))) * abs(self.vel.x)
+            self.vel.y = (1 / -tan(radians(44)))
         elif paddle.get_segment(self) == 2:
-            self.vel.y = (1 / -tan(radians(75))) * abs(self.vel.x)
+            self.vel.y = (1 / -tan(radians(72)))
         elif paddle.get_segment(self) == 3:
-            self.vel.y = 0
+            self.vel.y = (1 / -tan(radians(88)))
         elif paddle.get_segment(self) == 4:
-            self.vel.y = 0
+            self.vel.y = (1 / -tan(radians(92)))
         elif paddle.get_segment(self) == 5:
-            self.vel.y = (1 / -tan(radians(105))) * abs(self.vel.x)
+            self.vel.y = (1 / -tan(radians(108)))
         elif paddle.get_segment(self) == 6:
-            self.vel.y = (1 / -tan(radians(145))) * abs(self.vel.x)
+            self.vel.y = (1 / -tan(radians(136)))
         elif paddle.get_segment(self) == 7:
-            self.vel.y = (1 / -tan(radians(165))) * abs(self.vel.x)
+            self.vel.y = (1 / -tan(radians(150)))
+
+        self.vel.normalize()
+        self.vel *= current_speed
 
     def score(self) -> str:
         if self.pos.x - self.rad // 2 <= 0:
@@ -80,9 +98,43 @@ class Pong(object):
 
     def go_harder(self):
         if self.color[1] > 50:
-            self.speed += 0.8
+            self.boost += 0.08
             self.color[1] -= 50
             self.color[2] -= 50
+
+    def deviate(self):
+        x = self.vel.x
+        y = self.vel.y
+
+        radius: float = self.vel.length()
+        try:
+            angle: float = degrees(atan(y / x))
+        except ZeroDivisionError:
+            return
+
+        if x >= 0 and not y >= 0:
+            angle += 360
+        if not x >= 0 and y >= 0:
+            angle += 180
+        if not x >= 0 and not y >= 0:
+            angle += 180
+
+        angle += randint(-2, 2)
+        self.vel.x = radius * cos(radians(angle))
+        self.vel.y = radius * sin(radians(angle))
+
+    def turn_around(self):
+        chance = uniform(0, 1)
+        if not (chance < 0.05):
+            return
+
+        self.vel.x = -self.vel.x
+
+    def check_out_of_bounds(self) -> bool:
+        if self.pos.y < 0 or self.pos.y > HEIGHT:
+            return True
+        else:
+            return False
 
 
 class Paddle(object):
@@ -92,7 +144,7 @@ class Paddle(object):
         self.width = 16
         self.height = 85
         self.y = HEIGHT // 2 - self.height // 2
-        self.speed = 10
+        self.speed = 11.5
         self.color = color
         self.segment = self.height / 8
 
@@ -112,23 +164,23 @@ class Paddle(object):
             self.y += self.speed
 
     def get_segment(self, pong: Pong) -> int:
-        y = pong.pos.y + pong.rad
-        if y >= self.y + self.segment * 7:
-            return 7
-        elif y >= self.y + self.segment * 6:
-            return 6
-        elif y >= self.y + self.segment * 5:
-            return 5
-        elif y >= self.y + self.segment * 4:
-            return 4
-        elif y >= self.y + self.segment * 3:
-            return 3
-        elif y >= self.y + self.segment * 2:
-            return 2
-        elif y >= self.y + self.segment:
-            return 1
-        elif y >= self.y:
+        y = pong.pos.y
+        if y <= self.y + self.segment:
             return 0
+        elif y <= self.y + self.segment * 2:
+            return 1
+        elif y <= self.y + self.segment * 3:
+            return 2
+        elif y <= self.y + self.segment * 4:
+            return 3
+        elif y <= self.y + self.segment * 5:
+            return 4
+        elif y <= self.y + self.segment * 6:
+            return 5
+        elif y <= self.y + self.segment * 7:
+            return 6
+        else:
+            return 7
 
 
 def toggle_fullscreen(mode):
@@ -233,7 +285,7 @@ def splash_screen_state() -> int:
     start_font = pygame.font.Font(masaaki, 45)
     start_text = start_font.render("Press SPACE to start.", True, (240, 240, 240))
     start_width = start_text.get_width()
-    title_text = title_font.render("PONG", True, (240, 240, 240))
+    title_text = title_font.render("PYONG", True, (240, 240, 240))
     title_width = title_text.get_width()
     start = False
 
@@ -325,23 +377,7 @@ def show_version():
 
 
 def game_init():
-    global window, clock, fps_font, score_font, player1_score, player2_score, masaaki, \
-        hit_low, hit_high, score_left, score_right
-    os.environ["SDL_VIDEO_CENTERED"] = "1"
-    pygame.mixer.init(22050, -16, 2, 512)
-    pygame.init()
-    toggle_fullscreen("init")
-    pygame.display.set_caption(title)
-    pygame.display.set_icon(pygame.image.load(os.path.join("gfx", "pong.png")))
-    pygame.mouse.set_visible(False)
-    clock = pygame.time.Clock()
-    masaaki = os.path.join("gfx", "Masaaki-Regular.otf")
-    fps_font = pygame.font.Font(masaaki, 20)
-    score_font = pygame.font.Font(masaaki, 50)
-    hit_low = pygame.mixer.Sound(os.path.join("sounds", "hit_low.wav"))
-    hit_high = pygame.mixer.Sound(os.path.join("sounds", "hit_high.wav"))
-    score_left = pygame.mixer.Sound(os.path.join("sounds", "score_left.wav"))
-    score_right = pygame.mixer.Sound(os.path.join("sounds", "score_right.wav"))
+    global player1_score, player2_score
     player1_score = 0
     player2_score = 0
 
@@ -380,6 +416,10 @@ def game_loop():
         elif pong.score() == "player2":
             player1_score += 1
             start()
+            pygame.time.wait(400)
+        if pong.check_out_of_bounds():
+            start()
+            print("OUT_OF_BOUNDS")
             pygame.time.wait(400)
 
     def render():
@@ -439,8 +479,26 @@ def game_loop():
         elif player2_score == 10:
             run = False
             game_over_state("player2")
-        clock.tick(24)
+        clock.tick(60)
 
+
+os.environ["SDL_VIDEO_CENTERED"] = "1"
+pygame.mixer.init(22050, -16, 2, 512)
+pygame.init()
+toggle_fullscreen("init")
+pygame.display.set_caption(title)
+pygame.display.set_icon(pygame.image.load(os.path.join("gfx", "pong.png")))
+pygame.mouse.set_visible(False)
+clock = pygame.time.Clock()
+masaaki = os.path.join("gfx", "Masaaki-Regular.otf")
+fps_font = pygame.font.Font(masaaki, 20)
+score_font = pygame.font.Font(masaaki, 50)
+hit_low = pygame.mixer.Sound(os.path.join("sounds", "hit_low.wav"))
+hit_high = pygame.mixer.Sound(os.path.join("sounds", "hit_high.wav"))
+score_left = pygame.mixer.Sound(os.path.join("sounds", "score_left.wav"))
+score_right = pygame.mixer.Sound(os.path.join("sounds", "score_right.wav"))
+player1_score = 0
+player2_score = 0
 
 if __name__ == "__main__":
     while running:
